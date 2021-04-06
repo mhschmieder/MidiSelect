@@ -19,8 +19,8 @@ bool MidiSelectProcessor::findNextNote()
     int current = currentNote;
     // User jmin/jmax so this works even if somehow the end user is able to set
     // max below min
-    int lower = jmin(lowerNote, upperNote);
-    int upper = jmax(lowerNote, upperNote);
+    int lower = juce::jmin(lowerNote, upperNote);
+    int upper = juce::jmax(lowerNote, upperNote);
     
     while (++current) {
         
@@ -68,7 +68,7 @@ MidiSelectProcessor::~MidiSelectProcessor()
 }
 
 //==============================================================================
-const String MidiSelectProcessor::getName() const
+const juce::String MidiSelectProcessor::getName() const
 {
     return JucePlugin_Name;
 }
@@ -110,46 +110,46 @@ void MidiSelectProcessor::setParameter (int index, float newValue)
     }
 }
 
-const String MidiSelectProcessor::getParameterName (int index)
+const juce::String MidiSelectProcessor::getParameterName (int index)
 {
     switch (index) {
         case 0:
-            return translate("Lower Note");
+            return juce::translate("Lower Note");
         
         case 1:
-            return translate("Upper Note");
+            return juce::translate("Upper Note");
             
         default:
             break;
     }
     
-    return String();
+    return juce::String();
 }
 
-const String MidiSelectProcessor::getParameterText (int index)
+const juce::String MidiSelectProcessor::getParameterText (int index)
 {
     switch (index) {
         case 0:
-            return MidiMessage::getMidiNoteName(lowerNote, true, true, octaveForMiddleC);
+            return juce::MidiMessage::getMidiNoteName(lowerNote, true, true, octaveForMiddleC);
         
         case 1:
-            return MidiMessage::getMidiNoteName(upperNote, true, true, octaveForMiddleC);
+            return juce::MidiMessage::getMidiNoteName(upperNote, true, true, octaveForMiddleC);
             
         default:
             break;
     }
     
-    return String();
+    return juce::String();
 }
 
-const String MidiSelectProcessor::getInputChannelName (int channelIndex) const
+const juce::String MidiSelectProcessor::getInputChannelName (int channelIndex) const
 {
-    return String (channelIndex + 1);
+    return juce::String (channelIndex + 1);
 }
 
-const String MidiSelectProcessor::getOutputChannelName (int channelIndex) const
+const juce::String MidiSelectProcessor::getOutputChannelName (int channelIndex) const
 {
-    return String (channelIndex + 1);
+    return juce::String (channelIndex + 1);
 }
 
 bool MidiSelectProcessor::isInputChannelStereoPair (int index) const
@@ -197,12 +197,12 @@ void MidiSelectProcessor::setCurrentProgram (int index)
 {
 }
 
-const String MidiSelectProcessor::getProgramName (int index)
+const juce::String MidiSelectProcessor::getProgramName (int index)
 {
-    return String();
+    return juce::String();
 }
 
-void MidiSelectProcessor::changeProgramName (int index, const String& newName)
+void MidiSelectProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
@@ -219,16 +219,16 @@ void MidiSelectProcessor::releaseResources()
     // spare memory, etc.
 }
 
-void MidiSelectProcessor::processBlock (AudioSampleBuffer &buffer, MidiBuffer &midiMessages)
+void MidiSelectProcessor::processBlock (juce::AudioSampleBuffer &buffer, juce::MidiBuffer &midiMessages)
 {
     // Do nothing to buffer; just let it pass through
 
-    MidiBuffer inputMessages(midiMessages);
+    juce::MidiBuffer inputMessages(midiMessages);
     midiMessages.clear();
     
-    MidiBuffer::Iterator it(inputMessages);
+    juce::MidiBuffer::Iterator it(inputMessages);
     while (true) {
-        MidiMessage message(0xf0);
+        juce::MidiMessage message(0xf0);
         int samplePosition;
         if (!it.getNextEvent(message, samplePosition)) {
             break;
@@ -280,34 +280,34 @@ bool MidiSelectProcessor::hasEditor() const
     return false; // (change this to false if you choose to not supply an editor)
 }
 
-AudioProcessorEditor* MidiSelectProcessor::createEditor()
+juce::AudioProcessorEditor* MidiSelectProcessor::createEditor()
 {
     return NULL;
 }
 
 //==============================================================================
-void MidiSelectProcessor::getStateInformation (MemoryBlock &destData)
+void MidiSelectProcessor::getStateInformation (juce::MemoryBlock &destData)
 {
     // Use json for better forward-compatibility (not just splat)
     
-    DynamicObject *data = new DynamicObject;
+    juce::DynamicObject *data = new juce::DynamicObject;
     data->setProperty("lowerNote", lowerNote);
     data->setProperty("upperNote", upperNote);
     
-    String json = JSON::toString(var(data), true);
+    juce::String json = juce::JSON::toString(juce::var(data), true);
     
-    MemoryOutputStream stream(destData, false);
+    juce::MemoryOutputStream stream(destData, false);
     stream.write(json.toUTF8(), json.length());
 }
 
 void MidiSelectProcessor::setStateInformation (const void *data, int sizeInBytes)
 {
-    MemoryBlock memoryBlock(data, sizeInBytes);
-    MemoryInputStream stream(memoryBlock, false);
+    juce::MemoryBlock memoryBlock(data, sizeInBytes);
+    juce::MemoryInputStream stream(memoryBlock, false);
     
-    String jsonString = stream.readEntireStreamAsString();
+    juce::String jsonString = stream.readEntireStreamAsString();
     
-    auto jsonData = JSON::fromString(jsonString);
+    auto jsonData = juce::JSON::fromString(jsonString);
     
     // Don't bother trying to read if it's not an object
     if (!jsonData.isObject()) return;
@@ -318,7 +318,7 @@ void MidiSelectProcessor::setStateInformation (const void *data, int sizeInBytes
 
 //==============================================================================
 // This creates new instances of the plugin..
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
+juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new MidiSelectProcessor();
 }
